@@ -2,9 +2,24 @@ const serverless = require("serverless-http");
 const express = require("express");
 const app = express();
 
-app.get("/", (req, res, next) => {
+const { neon, neonConfig } = require("@neondatabase/serverless");
+
+// database connection
+async function dbClient() {
+  neonConfig.fetchConnectionCache = true;
+  const sql = neon(
+    "postgresql://dassudip.info:P4mB6tbHAgNy@ep-dry-cherry-a5s8ch2d.us-east-2.aws.neon.tech/test?sslmode=require"
+  );
+  // const sql = neon(process.env.DATABASE_URL);
+  return sql;
+}
+
+app.get("/", async (req, res, next) => {
+  const db = await dbClient();
+  const reshut = await db`select now()`;
   return res.status(200).json({
     message: "Hello from root!",
+    reshut: reshut,
   });
 });
 
